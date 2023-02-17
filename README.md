@@ -307,19 +307,19 @@ constructor(
 
 ### `Sending a message to the destination chain`
 
-pingDestination Function:-
+**pingDestination Function**:-
 
 This function initiates a cross-chain transaction to a specified destination contract on a different blockchain network. The function accepts various input parameters, including the type and ID of the destination blockchain network, the gas price for executing the transaction on the destination network, the gas price for an acknowledgement to be sent back to the source network, the destination contract's address, a string payload, and an expiry duration for the transaction.
 
 Here is a breakdown of the input parameters:
 
-chainType: an unsigned 64-bit integer representing the type of the destination blockchain network (e.g., Ethereum, Binance Smart Chain, etc.).
-chainId: a string representing the unique identifier of the destination blockchain network (e.g., network ID, network name, etc.).
-destGasPrice: an unsigned 64-bit integer representing the gas price in Wei (the smallest unit of ether) for executing the transaction on the destination network.
-ackGasPrice: an unsigned 64-bit integer representing the gas price in Wei for an acknowledgement to be sent back to the source network.
-destinationContractAddress: a bytes array representing the address of the destination contract on the destination network.
-str: a string representing the payload of the transaction to be executed on the destination contract.
-expiryDurationInSeconds: an unsigned 64-bit integer representing the duration in seconds until the transaction expires.
+**chainType**: an unsigned 64-bit integer representing the type of the destination blockchain network (e.g., Ethereum, Cosmos, Polkado, etc.).
+**chainId**: a string representing the unique identifier of the destination blockchain network (e.g., network ID, network name, etc.).
+**destGasPrice**: an unsigned 64-bit integer representing the gas price in Wei (the smallest unit of ether) for executing the transaction on the destination network.
+**ackGasPrice**: an unsigned 64-bit integer representing the gas price in Wei for an acknowledgement to be sent back to the source network.
+**destinationContractAddress**: a bytes array representing the address of the destination contract on the destination network.
+**str**: a string representing the payload of the transaction to be executed on the destination contract.
+**expiryDurationInSeconds**: an unsigned 64-bit integer representing the duration in seconds until the transaction expires.
 The function then creates a byte array containing the string payload using the abi.encode() function and calculates the expiry timestamp by adding the current block timestamp to the expiry duration. It then creates a Utils.DestinationChainParams struct containing the destination gas limit, gas price, chain type, and chain ID, and a Utils.AckGasParams struct containing the acknowledgement gas limit and gas price.
 
 Finally,since we want to create only a single request to the destination chain it calls the CrossTalkUtils.singleRequestWithAcknowledgement() function, passing in the gatewayContract address, expiry timestamp, acknowledgement type, acknowledgement gas parameters, destination chain parameters, destination contract address, and payload. The function is marked as payable, which means it can receive Ether as part of the transaction.
@@ -360,16 +360,16 @@ Finally,since we want to create only a single request to the destination chain i
 ```
 ### `Handling a crosschain request`
 
-handleRequestFromSource function:-
+**handleRequestFromSource function:-**
 
 The function is designed to handle a request that originates from a source chain , passes through a router chain, and arrives at the contract on a destination blockchain.
 
 The function takes four parameters:
 
-"srcContractAddress": the address of the source contract that initiated the request.
-"payload": a byte array that contains the payload of the request.
-"srcChainId": a string that represents the ID of the source blockchain.
-"srcChainType": an unsigned 64-bit integer that represents the type of the source blockchain.
+**srcContractAddress**: the address of the source contract that initiated the request.
+**payload**: a byte array that contains the payload of the request.
+**srcChainId**: a string that represents the ID of the source blockchain.
+**srcChainType**: an unsigned 64-bit integer that represents the type of the source blockchain.
 The function is marked as "external" and "override", meaning that it can be called from outside the contract and it overrides a function with the same name and signature in the contract it inherits from.
 
 The function first checks that the caller of the function is the "gatewayContract" by using the "require" statement. If the caller is not the gateway contract, the function will stop executing and return an error.
@@ -403,7 +403,7 @@ Finally, the function will return a byte array that contains the "srcChainId" an
  
 ### `Handling the acknowledgement received from destination chain`
 
-handleCrossTalkAck function:-
+**handleCrossTalkAck function:-**
 
 This function handles the acknowledgement sent by the destination chain to the source chain after a successful cross-chain communication. The function takes three parameters: the event identifier, a boolean array of execution flags, and a byte array of execution data. It is an external view function and is marked as an override of a parent contract's function.
 
@@ -411,7 +411,7 @@ The function first checks that the event identifier passed in as the first param
 
 Next, the function decodes the first element of the execData array, which is assumed to be a byte array. The decoded bytes are then further decoded as a tuple of a string and a uint64, representing the chain ID and chain type of the source chain that initiated the cross-chain communication.
 
-After decoding the execution data, the function emits two events. The first event is an ExecutionStatus event that emits the event identifier and the first element of the execFlags array as parameters. The second event is a ReceivedSrcChainIdAndType event that emits the chain type and chain ID of the source chain as parameters.
+After decoding the execution data, the function emits two events. The first event is an **ExecutionStatus** event that emits the event identifier and the first element of the execFlags array as parameters. The second event is a **ReceivedSrcChainIdAndType** event that emits the chain type and chain ID of the source chain as parameters.
 
 1. **if the execution was successful on the destination chain:**
     
