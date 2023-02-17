@@ -313,13 +313,20 @@ This function initiates a cross-chain transaction to a specified destination con
 
 Here is a breakdown of the input parameters:
 
-**chainType**: an unsigned 64-bit integer representing the type of the destination blockchain network (e.g., Ethereum, Cosmos, Polkado, etc.).<br/>
-**chainId**: a string representing the unique identifier of the destination blockchain network (e.g., network ID, network name, etc.).<br/>
-**destGasPrice**: an unsigned 64-bit integer representing the gas price in Wei (the smallest unit of ether) for executing the transaction on the destination network.<br/>
-**ackGasPrice**: an unsigned 64-bit integer representing the gas price in Wei for an acknowledgement to be sent back to the source network.<br/>
-**destinationContractAddress**: a bytes array representing the address of the destination contract on the destination network.<br/>
-**str**: a string representing the payload of the transaction to be executed on the destination contract.<br/>
-**expiryDurationInSeconds**: an unsigned 64-bit integer representing the duration in seconds until the transaction expires.<br/>
+1. **chainType**: an unsigned 64-bit integer representing the type of the destination blockchain network (e.g., Ethereum, Cosmos, Polkado, etc.)
+
+2. **chainId**: a string representing the unique identifier of the destination blockchain network (e.g., network ID, network name, etc.)
+
+3. **destGasPrice**: an unsigned 64-bit integer representing the gas price in Wei (the smallest unit of ether) for executing the transaction on the destination network.
+
+4. **ackGasPrice**: an unsigned 64-bit integer representing the gas price in Wei for an acknowledgement to be sent back to the source network
+
+5. **destinationContractAddress**: a bytes array representing the address of the destination contract on the destination network
+ 
+6. **str**: a string representing the payload of the transaction to be executed on the destination contract
+
+7. **expiryDurationInSeconds**: an unsigned 64-bit integer representing the duration in seconds until the transaction expires
+
 The function then creates a byte array containing the string payload using the abi.encode() function and calculates the expiry timestamp by adding the current block timestamp to the expiry duration. It then creates a Utils.DestinationChainParams struct containing the destination gas limit, gas price, chain type, and chain ID, and a Utils.AckGasParams struct containing the acknowledgement gas limit and gas price.
 
 Finally,since we want to create only a single request to the destination chain it calls the CrossTalkUtils.singleRequestWithAcknowledgement() function, passing in the gatewayContract address, expiry timestamp, acknowledgement type, acknowledgement gas parameters, destination chain parameters, destination contract address, and payload. The function is marked as payable, which means it can receive Ether as part of the transaction.
