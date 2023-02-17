@@ -343,29 +343,39 @@ _pingDestination(expiryTimestamp, 80000000000, 80000000000, 0, chainId, payloads
 _pingDestination function calls the requestToDest function on the Router's Gateway contract to generate a cross-chain request and stores the nonce returned into the lastEventIdentifier. 
 
 ```sh
-    function _pingDestination(
-        uint64 expiryTimestamp,
-        uint64 destGasPrice,
-        uint64 ackGasPrice,
-        uint64 chainType,
-        string memory chainId,
-        bytes[] memory payloads,
-        bytes[] memory addresses
-    ) internal {
-        gatewayContract.requestToDest(
-            expiryTimestamp,
-            false,
-            Utils.AckType.ACK_ON_SUCCESS,
-            Utils.AckGasParams(ackGasLimit, ackGasPrice),
-            Utils.DestinationChainParams(
-                destGasLimit,
-                destGasPrice,
-                chainType,
-                chainId
-            ),
-            Utils.ContractCalls(payloads, addresses)
-        );
-    }
+   function pingDestination(
+  uint64 chainType,
+  string memory chainId,
+  uint64 destGasPrice,
+  uint64 ackGasPrice,
+  bytes memory destinationContractAddress,
+  string memory str,
+  uint64 expiryDurationInSeconds
+) public payable returns (uint64) {
+  bytes memory payload = abi.encode(str);
+  uint64 expiryTimestamp = uint64(block.timestamp) + expiryDurationInSeconds;
+  Utils.DestinationChainParams memory destChainParams = 
+					Utils.DestinationChainParams(
+						destGasLimit, 
+            destGasPrice, 
+            chainType, 
+            chainId
+					);
+
+  Utils.AckType ackType = Utils.AckType.ACK_ON_SUCCESS;
+  Utils.AckGasParams memory ackGasParams = 
+					Utils.AckGasParams(ackGasLimit, ackGasPrice);
+  
+  CrossTalkUtils.singleRequestWithAcknowledgement(
+      gatewayContract,
+      expiryTimestamp,
+      ackType,
+      ackGasParams,
+      destChainParams,
+      destinationContractAddress,
+      payload
+  );
+}
 ```
 ### `Handling a crosschain request`
 
