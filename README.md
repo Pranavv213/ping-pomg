@@ -50,6 +50,7 @@ npm start
   - [`Creating state variables and the constructor`](#Creating-state-variables-and-the-constructor)
   - [`Sending a message to the destination chain`](#Sending-a-message-to-the-destination-chain)
   - [`Handling a crosschain request`](#Handling-a-crosschain-request)
+  - [`Handling the acknowledgement received from destination chain`](#Handling-the-acknowledgement-received-from-destination-chain)
   
 # 🏗 Frontend
 
