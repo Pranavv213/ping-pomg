@@ -324,26 +324,8 @@ The function then creates a byte array containing the string payload using the a
 
 Finally,since we want to create only a single request to the destination chain it calls the CrossTalkUtils.singleRequestWithAcknowledgement() function, passing in the gatewayContract address, expiry timestamp, acknowledgement type, acknowledgement gas parameters, destination chain parameters, destination contract address, and payload. The function is marked as payable, which means it can receive Ether as part of the transaction.
 
-Overall, the function allows for cross-chain communication and the execution of transactions on a destination blockchain network, with the option for an acknowledgement to be sent back to the source network.
 ```sh
-Creating a channel/ Sending a message to an address on destination chain
-
-function pingDestination(string memory chainId, address destinationContractAddress, address user0, address user1, string memory message) public payable {
-currentRequestId++;
-bytes memory payload = abi.encode(currentRequestId, user0, user1, message);
-uint64 expiryTimestamp = uint64(block.timestamp) + 100000000000;
-bytes[] memory addresses = new bytes;
-addresses[0] = toBytes(destinationContractAddress);
-bytes[] memory payloads = new bytes;
-payloads[0] = payload;
-_pingDestination(expiryTimestamp, 80000000000, 80000000000, 0, chainId, payloads, addresses);
-}
-```
-
-_pingDestination function calls the requestToDest function on the Router's Gateway contract to generate a cross-chain request and stores the nonce returned into the lastEventIdentifier. 
-
-```sh
-   function pingDestination(
+  function pingDestination(
   uint64 chainType,
   string memory chainId,
   uint64 destGasPrice,
@@ -354,17 +336,16 @@ _pingDestination function calls the requestToDest function on the Router's Gatew
 ) public payable returns (uint64) {
   bytes memory payload = abi.encode(str);
   uint64 expiryTimestamp = uint64(block.timestamp) + expiryDurationInSeconds;
-  Utils.DestinationChainParams memory destChainParams = 
-					Utils.DestinationChainParams(
-						destGasLimit, 
+  Utils.DestinationChainParams memory destChainParams=
+          Utils.DestinationChainParams(
+	    destGasLimit, 
             destGasPrice, 
             chainType, 
             chainId
-					);
+	);
 
   Utils.AckType ackType = Utils.AckType.ACK_ON_SUCCESS;
-  Utils.AckGasParams memory ackGasParams = 
-					Utils.AckGasParams(ackGasLimit, ackGasPrice);
+  Utils.AckGasParams memory ackGasParams = Utils.AckGasParams(ackGasLimit, ackGasPrice);
   
   CrossTalkUtils.singleRequestWithAcknowledgement(
       gatewayContract,
