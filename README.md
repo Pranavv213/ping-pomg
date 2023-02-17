@@ -360,79 +360,23 @@ Finally,since we want to create only a single request to the destination chain i
 ```
 ### `Handling a crosschain request`
 
-To handle cross-chain requests on the destination chain we make use of handleRequestFromSource function. This function is automatically called when the destination chain receives the requests, and the user does not need to manually call it. The core logic of the dapp is written in this function to store the message and contacts in two mappings, map and contacts, respectively.
+The function is designed to handle a request that originates from a source chain , passes through a router chain, and arrives at the contract on a destination blockchain.
 
-Mappings:
+The function takes four parameters:
 
-map: This mapping is used to store the messages between two contacts. The messages are stored in a string array indexed by the two addresses of the contacts who are communicating.
+"srcContractAddress": the address of the source contract that initiated the request.
+"payload": a byte array that contains the payload of the request.
+"srcChainId": a string that represents the ID of the source blockchain.
+"srcChainType": an unsigned 64-bit integer that represents the type of the source blockchain.
+The function is marked as "external" and "override", meaning that it can be called from outside the contract and it overrides a function with the same name and signature in the contract it inherits from.
 
-contacts: This mapping is used to store the contacts for a particular user. It maps the address of a user to an array of addresses of their contacts.
+The function first checks that the caller of the function is the "gatewayContract" by using the "require" statement. If the caller is not the gateway contract, the function will stop executing and return an error.
 
-handleRequestFromSource() Function
-The handleRequestFromSource function is called automatically by the destination chain upon receipt of a cross-chain request. It takes in the following parameters:
+The function then decodes the "payload" parameter into a string variable called "sampleStr". It checks if the string is empty by comparing its hash to the hash of an empty string using the "keccak256" function. If the string is empty, the function will stop executing and return a custom error message.
 
-srcContractAddress: The address of the source contract.
-payload: The payload of the cross-chain request, which contains the relevant information to be processed by the destination chain.
-srcChainId: The ID of the source chain.
-srcChainType: The type of the source chain.
-The function decodes the payload and retrieves the information, which includes a request ID, two wallet addresses (user0 and user1), and a message. If the message is a special "#NULL#" value, the addresses are added to each other's contacts in the contacts mapping. If the message is not "#NULL#", it is added to the message history in the map mapping between the two addresses.
+If the string is not empty, the function will set the value of a global variable called "greeting" to the value of the "sampleStr" variable.
 
-getMessages() Function
-The getMessages function returns the message history between two addresses. It takes in two parameters:
-
-u0: The first wallet address.
-u1: The second wallet address.
-The function returns the message history stored in the map mapping between the two addresses.
-
-getContacts() Function
-The getContacts function returns the contacts of a given wallet address. It takes in one parameter:
-
-u0: The wallet address.
-The function returns the contacts stored in the contacts mapping for the given wallet address.
-
-```sh
-  mapping(address => mapping(address => string[])) public map;
-    mapping(address => address[]) public contacts;
-
-   function handleRequestFromSource(
-        bytes memory srcContractAddress,
-        bytes memory payload,
-        string memory srcChainId,
-        uint64 srcChainType
-    ) external override returns (bytes memory) {
-        require(msg.sender == address(gatewayContract));
-
-        (
-            uint64 requestId,
-            address user0,
-            address user1,
-            string memory message
-        ) = abi.decode(payload, (uint64, address, address, string));
-
-        if (
-            keccak256(abi.encodePacked(message)) ==
-            keccak256(abi.encodePacked("#NULL#"))
-        ) {
-            contacts[user0].push(user1);
-            contacts[user1].push(user0);
-        } else {
-            map[user0][user1].push(message);
-            map[user1][user0].push(message);
-        }
-
-        return abi.encode(requestId, user0, user1, message);
-    }
-
-    function getMessages(
-        address u0,
-        address u1
-    ) public view returns (string[] memory) {
-        return map[u0][u1];
-    }
-
-    function getContacts(address u0) public view returns (address[] memory) {
-        return contacts[u0];
-    }
+Finally, the function will return a byte array that contains the "srcChainId" and "srcChainType" parameters encoded using the "abi.encode" function.
  ```
  
  ### `Deployments`
