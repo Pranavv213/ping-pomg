@@ -366,10 +366,13 @@ The function is designed to handle a request that originates from a source chain
 
 The function takes four parameters:
 
-**srcContractAddress**: the address of the source contract that initiated the request.
-**payload**: a byte array that contains the payload of the request.
-**srcChainId**: a string that represents the ID of the source blockchain.
-**srcChainType**: an unsigned 64-bit integer that represents the type of the source blockchain.
+1. **srcContractAddress**: the address of the source contract that initiated the request.
+ 
+2. **payload**: a byte array that contains the payload of the request.
+ 
+3. **srcChainId**: a string that represents the ID of the source blockchain.
+
+4. **srcChainType**: an unsigned 64-bit integer that represents the type of the source blockchain.
 The function is marked as "external" and "override", meaning that it can be called from outside the contract and it overrides a function with the same name and signature in the contract it inherits from.
 
 The function first checks that the caller of the function is the "gatewayContract" by using the "require" statement. If the caller is not the gateway contract, the function will stop executing and return an error.
