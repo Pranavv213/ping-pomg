@@ -262,9 +262,8 @@ function handleCrossTalkAck(
       (string, uint64)
     );
 		
-		// emits the event identifier and true as execFlags[0]
     emit ExecutionStatus(eventIdentifier, execFlags[0]);
-		// emits the source chain Id and type that it gets back from the dest chain
+	
     emit ReceivedSrcChainIdAndType(chainType, chainID);
   }
   ```
