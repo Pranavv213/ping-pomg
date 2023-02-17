@@ -1,8 +1,8 @@
-# `Cross-Chat`
+# `Ping Pong`
 
-> Fully ready ReactJS Dapp for Cross-Chain Messaging using Router Cross-Talk
+> Effortlessly Send and Receive Messages Across Blockchains with Ping-Pong Dapp Built with ReactJS and Router Cross-Talk.
 
-🚀DEMO: https://cross-chat-47b25.web.app/
+🚀DEMO: link
 
 This project is built with [Router CrossTalk](https://dev.routerprotocol.com/crosstalk-library/overview/introduction)
 
@@ -22,10 +22,10 @@ If you need help or have other some questions - don't hesitate to write in our d
 
 # 🚀 `Quick Start`
 
-📄 Clone or fork `cross-chat`:
+📄 Clone or fork `ping-pong`:
 
 ```sh
-git clone https://github.com/protocol-designer/cross-chat.git
+git clone https://github.com/protocol-designer/ping-pong.git
 ```
 
 💿 Install all dependencies:
@@ -244,12 +244,13 @@ const getMessages = async () => {
   
 ### `Initiating the Contract`
 
-For initiating the smart contract named "CrossChat", the contract imports three external contracts to be used in the implementation of the "Initiating the Contract" contract.
+For initiating the smart contract named "PingPong", the contract imports three external contracts :-
 
-The "ICrossTalkApplication.sol" and "Utils.sol" contracts are imported from the "evm-gateway-contract/contracts" folder.
-The "CrossTalkUtils.sol" contract is imported from the "@routerprotocol/crosstalk-utils/contracts" folder.
-The "CrossChat" contract implements the "ICrossTalkApplication" contract by inheriting from it. This means that the "CrossChat" contract must have all the functions and variables defined in the "ICrossTalkApplication" contract.
-By importing and implementing these contracts, the "CrossChat" contract will have access to their functionality and will be compatible with other contracts that follow the same standards.
+1)"ICrossTalkApplication.sol"
+2)"Utils.sol"
+3)"IGateway.sol"
+
+The "ICrossTalkApplication.sol", "Utils.sol" and "IGateway.sol" contracts are imported from the "evm-gateway-contract/contracts" The "PingPong" contract implements the "ICrossTalkApplication" contract by inheriting from it. This means that the "PingPong" contract must have all the functions and variables defined in the "ICrossTalkApplication" contract. By importing and implementing these contracts, the "CrossChat" contract will have access to their functionality and will be compatible with other contracts that follow the same standards.
 
 ```sh
 //SPDX-License-Identifier: UNLICENSED
@@ -304,33 +305,26 @@ constructor(
 }
 ```
 
-### `Creating a channel/ Sending a message to an address on destination chain`
+### `Sending a message to the destination chain`
 
 pingDestination Function:-
-The pingDestination function is used to create a channel and send a message to a specified address on a destination chain. It is a public function that is payable.
 
-Parameters
-The function takes in the following parameters:
+This function initiates a cross-chain transaction to a specified destination contract on a different blockchain network. The function accepts various input parameters, including the type and ID of the destination blockchain network, the gas price for executing the transaction on the destination network, the gas price for an acknowledgement to be sent back to the source network, the destination contract's address, a string payload, and an expiry duration for the transaction.
 
-chainId (string memory): the id of the destination chain,
-destinationContractAddress (address): the address of the destination contract to which the message will be sent,
-user0 (address): the wallet address of the sender,
-user1 (address): the wallet address of the receiver,
-message (string memory): the message to be sent.
-Functionality
+Here is a breakdown of the input parameters:
 
-The pingDestination function Increments the currentRequestId,
-Encodes the currentRequestId, user0, user1, and message into a payload to be sent to the destination chain,
-Sets the expiryTimestamp to be the current block timestamp plus 100000000000,
-Converts the destinationContractAddress into an array of bytes called addresses,
-Assigns the payload to an array of bytes called payloads,
-Calls the _pingDestination function and passes the following parameters:
-expiryTimestamp
-80000000000 as source and destination chain gas limit
-chainId
-payloads
-addresses
+chainType: an unsigned 64-bit integer representing the type of the destination blockchain network (e.g., Ethereum, Binance Smart Chain, etc.).
+chainId: a string representing the unique identifier of the destination blockchain network (e.g., network ID, network name, etc.).
+destGasPrice: an unsigned 64-bit integer representing the gas price in Wei (the smallest unit of ether) for executing the transaction on the destination network.
+ackGasPrice: an unsigned 64-bit integer representing the gas price in Wei for an acknowledgement to be sent back to the source network.
+destinationContractAddress: a bytes array representing the address of the destination contract on the destination network.
+str: a string representing the payload of the transaction to be executed on the destination contract.
+expiryDurationInSeconds: an unsigned 64-bit integer representing the duration in seconds until the transaction expires.
+The function then creates a byte array containing the string payload using the abi.encode() function and calculates the expiry timestamp by adding the current block timestamp to the expiry duration. It then creates a Utils.DestinationChainParams struct containing the destination gas limit, gas price, chain type, and chain ID, and a Utils.AckGasParams struct containing the acknowledgement gas limit and gas price.
 
+Finally,since we want to create only a single request to the destination chain it calls the CrossTalkUtils.singleRequestWithAcknowledgement() function, passing in the gatewayContract address, expiry timestamp, acknowledgement type, acknowledgement gas parameters, destination chain parameters, destination contract address, and payload. The function is marked as payable, which means it can receive Ether as part of the transaction.
+
+Overall, the function allows for cross-chain communication and the execution of transactions on a destination blockchain network, with the option for an acknowledgement to be sent back to the source network.
 ```sh
 Creating a channel/ Sending a message to an address on destination chain
 
