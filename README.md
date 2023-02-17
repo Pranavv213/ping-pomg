@@ -377,35 +377,19 @@ The function then decodes the "payload" parameter into a string variable called 
 If the string is not empty, the function will set the value of a global variable called "greeting" to the value of the "sampleStr" variable.
 
 Finally, the function will return a byte array that contains the "srcChainId" and "srcChainType" parameters encoded using the "abi.encode" function.
+
  ```
  
- ### `Deployments`
+ ### `Ack`
  
-To implement cross-chain communication, we need to deploy the same contract on all chains that we want to have communication with. The first step is to open https://remix.ethereum.org/ and compile the code. After that, we need to deploy the contract on the desired chains and pass in the Gateway address, destination gas limit, and source gas limit as parameters. The Gateway address can be found on the Router Protocol's Supported Chains documentation page at https://devnet-docs.routerprotocol.com/networks/supported-chains.
+This function handles the acknowledgement sent by the destination chain to the source chain after a successful cross-chain communication. The function takes three parameters: the event identifier, a boolean array of execution flags, and a byte array of execution data. It is an external view function and is marked as an override of a parent contract's function.
 
-To determine the gas limits, we can use a gas estimator. One option is to use the hardhat-gas-reporter plugin. Alternatively, we can view recent transactions on the desired chain through its explorer to determine the gas limit.
+The function first checks that the event identifier passed in as the first parameter matches the lastEventIdentifier variable, which is a state variable tracking the most recent cross-chain communication event. If the event identifier does not match, the function will revert.
 
-### `Back to Frontend`
+Next, the function decodes the first element of the execData array, which is assumed to be a byte array. The decoded bytes are then further decoded as a tuple of a string and a uint64, representing the chain ID and chain type of the source chain that initiated the cross-chain communication.
 
-To allow for cross-chain communication, the contract must be deployed on multiple chains. After deployment, copy the ABI of the contract, the addresses of the deployed contracts, and the chain IDs. Pass this information to the runContractFunction function as follows:
+After decoding the execution data, the function emits two events. The first event is an ExecutionStatus event that emits the event identifier and the first element of the execFlags array as parameters. The second event is a ReceivedSrcChainIdAndType event that emits the chain type and chain ID of the source chain as parameters.
 
-```sh
-const options = {
-    abi: <insert ABI here>,
-    contractAddress: <insert source contract address here>,
-    functionName: "pingDestination",
-    params: {
-      chainId: <insert destination chain ID here>,
-      destinationContractAddress: <insert destination contract address here>,
-      user0: account,
-      user1: channelReceiptAddress,
-      message: "#NULL#",
-    },
-};
-
-const result = await runContractFunction({ params: options });
-
-```
- 
+Overall, this function is a crucial part of the cross-chain communication process and ensures that the destination chain sends the appropriate acknowledgement back to the source chain.
  
 
