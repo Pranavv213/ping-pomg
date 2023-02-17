@@ -378,18 +378,25 @@ If the string is not empty, the function will set the value of a global variable
 
 Finally, the function will return a byte array that contains the "srcChainId" and "srcChainType" parameters encoded using the "abi.encode" function.
 
- ```
+ ```sh
+ function handleRequestFromSource(
+  bytes memory srcContractAddress,
+  bytes memory payload,
+  string memory srcChainId,
+  uint64 srcChainType
+) external override returns (bytes memory) {
+  require(msg.sender == gatewayContract);
+
+  string memory sampleStr = abi.decode(payload, (string));
+
+  if (
+    keccak256(abi.encodePacked(sampleStr)) == keccak256(abi.encodePacked(""))
+  ) {
+    revert CustomError("String should not be empty");
+  }
+  greeting = sampleStr;
+  return abi.encode(srcChainId, srcChainType);
+}
+```
  
- ### `Ack`
  
-This function handles the acknowledgement sent by the destination chain to the source chain after a successful cross-chain communication. The function takes three parameters: the event identifier, a boolean array of execution flags, and a byte array of execution data. It is an external view function and is marked as an override of a parent contract's function.
-
-The function first checks that the event identifier passed in as the first parameter matches the lastEventIdentifier variable, which is a state variable tracking the most recent cross-chain communication event. If the event identifier does not match, the function will revert.
-
-Next, the function decodes the first element of the execData array, which is assumed to be a byte array. The decoded bytes are then further decoded as a tuple of a string and a uint64, representing the chain ID and chain type of the source chain that initiated the cross-chain communication.
-
-After decoding the execution data, the function emits two events. The first event is an ExecutionStatus event that emits the event identifier and the first element of the execFlags array as parameters. The second event is a ReceivedSrcChainIdAndType event that emits the chain type and chain ID of the source chain as parameters.
-
-Overall, this function is a crucial part of the cross-chain communication process and ensures that the destination chain sends the appropriate acknowledgement back to the source chain.
- 
-
