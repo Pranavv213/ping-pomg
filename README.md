@@ -360,6 +360,8 @@ Finally,since we want to create only a single request to the destination chain i
 ```
 ### `Handling a crosschain request`
 
+handleRequestFromSource function:-
+
 The function is designed to handle a request that originates from a source chain , passes through a router chain, and arrives at the contract on a destination blockchain.
 
 The function takes four parameters:
@@ -399,4 +401,43 @@ Finally, the function will return a byte array that contains the "srcChainId" an
 }
 ```
  
- 
+### `Handling the acknowledgement received from destination chain`
+
+handleCrossTalkAck function:-
+
+This function handles the acknowledgement sent by the destination chain to the source chain after a successful cross-chain communication. The function takes three parameters: the event identifier, a boolean array of execution flags, and a byte array of execution data. It is an external view function and is marked as an override of a parent contract's function.
+
+The function first checks that the event identifier passed in as the first parameter matches the lastEventIdentifier variable, which is a state variable tracking the most recent cross-chain communication event. If the event identifier does not match, the function will revert.
+
+Next, the function decodes the first element of the execData array, which is assumed to be a byte array. The decoded bytes are then further decoded as a tuple of a string and a uint64, representing the chain ID and chain type of the source chain that initiated the cross-chain communication.
+
+After decoding the execution data, the function emits two events. The first event is an ExecutionStatus event that emits the event identifier and the first element of the execFlags array as parameters. The second event is a ReceivedSrcChainIdAndType event that emits the chain type and chain ID of the source chain as parameters.
+
+1. **if the execution was successful on the destination chain:**
+    
+    We will get [true] in execFlags and [abi.encode(abi.encode(sourceChainType, sourceChainId))] in execData as we sent this as return value in handleRequestFromSource function.
+    
+2. **If the execution failed on the destination chain:**
+    
+    We will get [false] in execFlags and [errorBytes] in execData where error bytes correspond to the error that was thrown on the destination chain contract
+
+```sh
+function handleCrossTalkAck(
+    uint64 eventIdentifier,
+    bool[] memory execFlags,
+    bytes[] memory execData
+  ) external view override {
+    require(lastEventIdentifier == eventIdentifier);
+		bytes memory _execData = abi.decode(execData[0], (bytes));
+
+    (string memory chainID, uint64 chainType) = abi.decode(
+      _execData,
+      (string, uint64)
+    );
+		
+		// emits the event identifier and true as execFlags[0]
+    emit ExecutionStatus(eventIdentifier, execFlags[0]);
+		// emits the source chain Id and type that it gets back from the dest chain
+    emit ReceivedSrcChainIdAndType(chainType, chainID);
+  }
+  ```
